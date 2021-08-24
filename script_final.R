@@ -53,8 +53,8 @@ grafico_dis<- function(bd, var){
 
 # Lendo o banco de dados =======
 
-diagnostico <- readxl::read_xlsx("Projeto2/dados_projeto2.xlsx",sheet = 1)
-baseline <- readxl::read_xlsx("Projeto2/dados_projeto2.xlsx",sheet = 2)
+diagnostico <- readxl::read_xlsx("dados_projeto2.xlsx",sheet = 1)
+baseline <- readxl::read_xlsx("dados_projeto2.xlsx",sheet = 2)
 
 # Manipulação do banco de dados ====
 
@@ -66,15 +66,7 @@ baseline$n_diagostico = factor(baseline$n_diagostico)
 baseline$depressao = factor(baseline$depressao)
 
 baseline <- baseline %>%  mutate(
-  Diagnostico_2 = case_when(
-    DiagnosticoNumerico == "1" ~ "Cntl",
-    DiagnosticoNumerico == "2" ~ "CCLA",
-    DiagnosticoNumerico == "3" ~ "CCLAMD",
-    DiagnosticoNumerico == "4" ~ "CCLNA",
-    DiagnosticoNumerico == "5" ~ "CCLSE",
-    DiagnosticoNumerico == "6" ~ "DA",
-    DiagnosticoNumerico == "7" ~ "DNA"),
-  n_diagostico2 = case_when(
+    n_diagostico2 = case_when(
     n_diagostico == "1" ~ "Controle",
     n_diagostico == "2" ~ "CCL Amnéstico",
     n_diagostico == "3" ~ "CCL Amnéstico de Múltiplos Domínios",
@@ -98,8 +90,8 @@ baseline <- baseline %>%  mutate(
     profissao == "0" ~ "Não",
     profissao == "1" ~ "Sim"))
 
-discretas <- dados %>% select(diagnostico,DiagnosticoNumerico,DiagnosticoNumerico_2,ano.atendimento,Diabetes,Hipertensao,Depressao,`VOC-Total`,RAVEN.Total,Pfeffer.Pac.Total,Pfeffer.Cuid.Total)
-continuas <- dados %>% select(diagnostico,DiagnosticoNumerico,Diabetes,Hipertensao,Depressao,`Mattis-Atencao`,MattisConstrucao_bruto,`Mattis–Conceituacao_bruto`,`5Dig.1B.Tempo`,escore_inibitorio,FV.Animais.T,FVF.S.Total.A,Ravlt.A6,Ravlt.A7,MMSE.Total,Mattis_total_bruto,FAB,Digitos.Direto.Acertos,Digitos.Inverso.Acertos,`TN-LIN.Total`)
+#discretas <- dados %>% select(diagnostico,DiagnosticoNumerico,DiagnosticoNumerico_2,ano.atendimento,Diabetes,Hipertensao,Depressao,`VOC-Total`,RAVEN.Total,Pfeffer.Pac.Total,Pfeffer.Cuid.Total)
+#continuas <- dados %>% select(diagnostico,DiagnosticoNumerico,Diabetes,Hipertensao,Depressao,`Mattis-Atencao`,MattisConstrucao_bruto,`Mattis–Conceituacao_bruto`,`5Dig.1B.Tempo`,escore_inibitorio,FV.Animais.T,FVF.S.Total.A,Ravlt.A6,Ravlt.A7,MMSE.Total,Mattis_total_bruto,FAB,Digitos.Direto.Acertos,Digitos.Inverso.Acertos,`TN-LIN.Total`)
 
 # Análise descritiva ====
 
