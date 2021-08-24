@@ -1,0 +1,72 @@
+---
+title: 'Coorte de Pacientes com Comprometimento Cognitivo Leve: Relação entre Diabetes, Depressão e Desfechos Cognitivos ao longo do tempo'
+author: 'Cliente: Mônica Vieira Costa; Orientador: Prof. Aloiso Joaquim Freitas Ribeiro'
+date: 'Consultores: Ana Clara Brasileiro; Bernardo Sieiro Silva Araújo; Danielly Santos Severino'
+output: 
+  html_document:
+    theme: yeti #default, cerulean, journal, flatly, darkly, readable, spacelab, united, cosmo, lumen, paper, sandstone, simplex, and yeti.
+    highlight: tango # default, tango, pygments, kate, monochrome, espresso, zenburn, haddock, breezedark, and textmate
+    toc: true
+    toc_depth: 5
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r, echo=FALSE, include=FALSE}
+require(readr)
+require(readxl)
+require("tabulizer")
+```
+
+# Contexto
+
+Ao analisar a faixa etária da população brasileira por sexo pode-se observar que ao longo dos últimos anos houve um aumento considerável da longevidade, resultando em um aumento da população idosa. Em especial, as pessoas mais idosas apresentam mais problemas físicos e mentais e, dentre as possíveis doenças esta pesquisa se concentra em descrever principalmente o **Comprometimento Cognitivo Leve (CCL)**.
+
+O CCL é caracterizado como uma fase sintomática onde o paciente apresenta leves sinais de perdas neurológicas associadas ao processo de envelhecimento, como por exemplo a doença de Alzheimer. Cabe ressaltar que a maior parte das pessoas com demência vivem em países em desenvolvimento. Além disso, estima-se que haja um aumento dos custos desses pacientes nos próximos anos.
+
+Existem diversas formas de envelhecimento que são divididos por dois principais grupos: envelhecimento patológico e envelhecimento fisiológico. A forma de envelhecimento depende de vários fatores como características hereditárias, sexo, nível socioeconômico, hábitos (alimentação, prática de exercícios físicos, etc), doenças incapacitantes (AVC, doença de Alzheimer, depressão).
+
+## Diagnósticos e Evoluções 
+
+```{r, echo = FALSE, out.width='100%', fig.align='center'}
+knitr::include_graphics('diag_evol.png')
+knitr::include_graphics('evolucao.png')
+```
+
+# Descrição do banco de dados
+
+O banco de dados contém informações de **647** pacientes acompanhados desde 2011 no Hospital das Clínicas da UFMG. Além disso foram observadas variáveis demográficas, cognitivas e referentes à comorbidades clínicas.
+
+Os diagnósticos dos pacientes foram separados em 7 principais grupos: 
+
+* CTRL - Controle; 
+* CCLA - Comprometimento Cognitivo Leve; 
+* CCLAMD - Comprometimento Cognitivo Leve Amnéstico de Múltiplos Domínios; 
+* CCLNA - Comprometimento Cognitivo Leve Não Amnéstico; 
+* CCLSE - Comprometimento Cognitivo sem especificação; 
+* DA - Demência por doença de Alzheimer;
+* DNA - Demência por doença não Alzheimer.
+
+Além disso, a evolução do diagnóstico corresponde a diferença do primeiro e segundo ou terceiro diagnóstico. 
+
+# Metodologia
+
+Na análise descritiva das variáveis categóricas foram utilizadas as frequências absoluta e relativa. Além disso, também foram feitos gráficos de barras com as porcentagens para essas variáveis. Já na análise descritiva das variáveis numéricas foram calculadas medidas de tendência central, posição e dispersão como média, quartis e desvio padrão.
+
+Para avaliar a evolução do Comprometimento Cognitivo Leve para a doença de Alzheimer foi feito um modelo de regressão logística multinomial. Este método é utilizado para verificar se existe relação entre a variável resposta com 3 categorias ou mais e as variáveis independentes, também chamadas de covariáveis. Através da regressão logística multinomial é possível definir a probabilidade de um indivíduo evoluir para determinado quadro a partir dos resultados de seus exames iniciais. Ao optar por essa técnica deve-se definir uma categoria de referência da variável resposta para compará-la com as demais categorias. Cabe ressaltar que, neste caso específico a variável resposta foi o diagnóstico do paciente e a categoria de referência foi “Comprometimento Cognitivo Leve Amnéstico de único domímio - CCLA”. O modelo foi ajustado considerando a idade, a escolaridade, a profissão e o sexo como variáveis de controle. Além disso, foi avaliada a influência da diabetes, da depressão e da hipertensão em relação ao diagnóstico.
+
+O software utilizado nas análises foi o R (versão 4.0.2).
+
+# Análise Estatística
+
+## Análise Descritiva
+
+
+
+
+
+
+
+
+
