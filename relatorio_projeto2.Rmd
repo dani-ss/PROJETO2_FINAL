@@ -54,7 +54,7 @@ Além disso, a evolução do diagnóstico corresponde a diferença do primeiro e
 
 Na análise descritiva das variáveis categóricas foram utilizadas as frequências absoluta e relativa. Além disso, também foram feitos gráficos de barras com as porcentagens para essas variáveis. Já na análise descritiva das variáveis numéricas foram calculadas medidas de tendência central, posição e dispersão como média, quartis e desvio padrão.
 
-Para avaliar a evolução do Comprometimento Cognitivo Leve para a doença de Alzheimer foi feito um modelo de regressão logística multinomial. Este método é utilizado para verificar se existe relação entre a variável resposta com 3 categorias ou mais e as variáveis independentes, também chamadas de covariáveis. Através da regressão logística multinomial é possível definir a probabilidade de um indivíduo evoluir para determinado quadro a partir dos resultados de seus exames iniciais. Ao optar por essa técnica deve-se definir uma categoria de referência da variável resposta para compará-la com as demais categorias. Cabe ressaltar que, neste caso específico a variável resposta foi o diagnóstico do paciente e a categoria de referência foi “Comprometimento Cognitivo Leve Amnéstico de único domímio - CCLA”. O modelo foi ajustado considerando a idade, a escolaridade, a profissão e o sexo como variáveis de controle. Além disso, foi avaliada a influência da diabetes, da depressão e da hipertensão em relação ao diagnóstico.
+Para avaliar a evolução do Comprometimento Cognitivo Leve para a doença de Alzheimer foi feito um modelo de regressão logística multinomial. Este método é utilizado para verificar se existe relação entre a variável resposta com 3 categorias ou mais e as variáveis independentes, também chamadas de covariáveis. Através da regressão logística multinomial é possível definir a probabilidade de um indivíduo evoluir para determinado quadro a partir dos resultados de seus exames iniciais. Ao optar por essa técnica deve-se definir uma categoria de referência da variável resposta para compará-la com as demais categorias. Cabe ressaltar que, neste caso específico a variável resposta foi o diagnóstico do paciente e a categoria de referência foi “CRTL - Controle”. O modelo foi ajustado considerando a idade, a escolaridade, a profissão e o sexo como variáveis de controle. Além disso, foi avaliada a influência da diabetes, da depressão e da hipertensão em relação ao diagnóstico.
 
 O software utilizado nas análises foi o R (versão 4.0.2).
 
@@ -62,11 +62,28 @@ O software utilizado nas análises foi o R (versão 4.0.2).
 
 ## Análise Descritiva
 
+## Regressão LogÍstica Multinomial 
 
+O modelo de regressão logística multinomial é utilizado quando a variável resposta possui 3 ou mais categorias. Por meio deste modelo podemos avaliar a evolução do quadro do diagnóstico dos pacientes a partir dos resultados de seus exames iniciais.
 
+Cabe ressaltar que a variável resposta foi o diagnóstico do paciente e a categoria de referência foi o grupo "CTRL - Controle". Os modelos foram ajustados considerando a idade, a escolaridade, a profissão e o sexo como variáveis de controle. Além disso, foram avaliadas a influência da diabetes, da depressão e da hipertensão em relação ao diagnóstico.
 
+Para este modelo a variável resposta corresponde ao logaritmo da razão de chance (*odds*) com a seguinte equação:
 
+$$
+log(odds) = logit(P) = ln(\frac{P}{1 - P}) = a + b_{1}x_{1} + b_{2}x_{2} + b_{3}x_{3} + ...
+$$
+sendo que,
 
+$$
+p = \frac{exp(a + b_{1}x_{1} + b_{2}x_{2} + b_{3}x_{3} + ...)}{1 + exp(a + b_{1}x_{1} + b_{2}x_{2} + b_{3}x_{3} + ...)}
+$$
+Onde, 
 
+$p$ = probabilidade de que um paciente apresente determinado diagnóstico;
 
+$a$ = constante;
 
+$b$ = coeficiente do preditor para as covariáveis.
+
+Portanto, o log da razão de chances equivale a probabilidade de que o paciente seja diagnosticado com algum tipo de comprometimento cognitivo. 
