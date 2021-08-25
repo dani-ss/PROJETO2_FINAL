@@ -13,12 +13,6 @@ output:
       smooth_scroll: true
 ---
 
-```{r, echo=FALSE, include=FALSE}
-require(readr)
-require(readxl)
-require("tabulizer")
-```
-
 # Contexto
 
 Ao analisar a faixa etária da população brasileira por sexo pode-se observar que ao longo dos últimos anos houve um aumento considerável da longevidade, resultando em um aumento da população idosa. Em especial, as pessoas mais idosas apresentam mais problemas físicos e mentais e, dentre as possíveis doenças esta pesquisa se concentra em descrever principalmente o **Comprometimento Cognitivo Leve (CCL)**.
@@ -86,4 +80,285 @@ $a$ = constante;
 
 $b$ = coeficiente do preditor para as covariáveis.
 
-Portanto, o log da razão de chances equivale a probabilidade de que o paciente seja diagnosticado com algum tipo de comprometimento cognitivo. 
+Portanto, o log da razão de chances equivale a probabilidade de que o paciente seja diagnosticado com algum tipo de comprometimento cognitivo.
+
+Carregando alguns pacotes e importando a base de dados:
+
+```{r, echo=TRUE, include=TRUE}
+require(rio)
+require(lmtest)
+dados <- import('base.xlsx')
+```
+
+```{r, echo=FALSE, include=FALSE}
+dados <- dados %>%  mutate(
+  Diagnostico_2 = case_when(
+    DiagnosticoNumerico == "1" ~ "Cntl",
+    DiagnosticoNumerico == "2" ~ "CCLA",
+    DiagnosticoNumerico == "3" ~ "CCLAMD",
+    DiagnosticoNumerico == "4" ~ "CCLNA",
+    DiagnosticoNumerico == "5" ~ "CCLSE",
+    DiagnosticoNumerico == "6" ~ "DA",
+    DiagnosticoNumerico == "7" ~ "DNA"),
+  Sexo_2 = case_when(
+    Sexo == "1" ~ "Homem",
+    Sexo == "2" ~ "Mulher"),
+  Diabetes_2 = case_when(
+    Diabetes == "0" ~ "Não",
+    Diabetes == "1" ~ "Sim"),
+  Hipertensao_2 = case_when(
+    Hipertensao == "0" ~ "Não",
+    Hipertensao == "1" ~ "Sim"),
+  Depressao_2 = case_when(
+    Depressao == "0" ~ "Não",
+    Depressao == "1" ~ "Sim"),
+  profissao_2 = case_when(
+    profissao == "0" ~ "Não",
+    profissao == "1" ~ "Sim"))
+
+dados$Escolaridade_2 <- ifelse(dados$Escolaridade == 0,'0 anos de estudo',
+                               ifelse(dados$Escolaridade > 0 & dados$Escolaridade < 5, '1 a 4 anos',
+                                      ifelse(dados$Escolaridade > 4 & dados$Escolaridade < 9,'5 a 8 anos',
+                                             ifelse(dados$Escolaridade > 8 & dados$Escolaridade < 12, '9 a 11 anos','12 ou mais anos'))))
+
+```
+
+Definido a ordem das categorias:
+
+```{r, echo=TRUE, include=TRUE}
+levels(dados$Diagnostico_2) <- c("Cntl","CCLA","CCLAMD","CCLNA","CCLSE","DA","DNA")
+levels(dados$Escolaridade_2) <- c('0 anos de estudo','1 a 4 anos','5 a 8 anos','9 a 11 anos','12 ou mais anos')
+```
+
+Excluindo os valores ausentes das variáveis:
+
+```{r, echo=TRUE, include=TRUE}
+dados_2 <- dados %>% filter(!is.na(Idade)) %>% filter(!is.na(Sexo_2)) %>% filter(!is.na(Escolaridade_2)) %>% filter(!is.na(profissao_2)) %>% 
+  filter(!is.na(Diabetes_2)) %>% filter(!is.na(Hipertensao_2)) %>% filter(!is.na(Depressao_2)) #389 observaçoes
+
+dados_2$Diagnostico_2 <- relevel(as.factor(dados_2$Diagnostico_2), ref = 'Cntl')
+
+```
+
+Ajustando o modelos de interesse:
+
+```{r, echo=TRUE, include=TRUE}
+# Modelo apenas com as variáveis de controle 
+mod_r <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 +
+                    profissao_2, 
+                  data = dados_2)
+
+# Modelo acrescentando Diabetes, Hipertensão e Depressão
+mod_1 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 +
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Diabetes_2 + 
+                    Hipertensao_2 + 
+                    Depressao_2, 
+                  data = dados_2) 
+
+# Modelo apenas com Diabetes e variáveis de controle
+mod_2 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Diabetes_2 , 
+                  data = dados_2)
+
+# Modelo apenas com Hipertensão e váriaveis de controle
+mod_3 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Hipertensao_2 , 
+                  data = dados_2)
+
+# Modelo apenas com Depressão e variáveis de controle
+mod_4 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Depressao_2, 
+                  data = dados_2)
+
+# Modelo com Diabetes e Hipertensão
+mod_5 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Diabetes_2 + 
+                    Hipertensao_2, 
+                  data = dados_2) 
+
+# Modelo com Diabetes e Depressão
+mod_6 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Diabetes_2 + 
+                    Depressao_2, 
+                  data = dados_2)
+
+# Modelo com Hipertensão e Depressão
+mod_7 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Hipertensao_2 + 
+                    Depressao_2, 
+                  data = dados_2) 
+
+# Modelo com iteração entre Diabetes e Depressão
+mod_8 <- multinom(Diagnostico_2 ~ Idade + 
+                    Sexo_2 + 
+                    Escolaridade_2 + 
+                    profissao_2 + 
+                    Diabetes_2 * Depressao_2, 
+                  data = dados_2) 
+
+```
+
+## Análise da Deviance
+
+A partir dessa análise podemos verificar se a deviance dos modelos ajustados é moderada ou não.
+
+```{r, echo=TRUE, include=TRUE}
+## Mod_r
+qchisq(0.95,385) < mod_r$deviance & mod_r$deviance < qchisq(0.99,385)
+
+## Mod1
+qchisq(0.95,382) < mod_1$deviance & mod_1$deviance < qchisq(0.99,382)
+
+## Mod2
+qchisq(0.95,384) < mod_2$deviance & mod_2$deviance < qchisq(0.99,384)
+
+## Mod3
+qchisq(0.95,384) < mod_3$deviance & mod_3$deviance < qchisq(0.99,384)
+
+## Mod4
+qchisq(0.95,384) < mod_4$deviance & mod_4$deviance < qchisq(0.99,384)
+
+## Mod5
+qchisq(0.95,383) < mod_5$deviance & mod_5$deviance < qchisq(0.99,383)
+
+## Mod6
+qchisq(0.95,383) < mod_6$deviance & mod_6$deviance < qchisq(0.99,383)
+
+## Mod7
+qchisq(0.95,383) < mod_7$deviance & mod_7$deviance < qchisq(0.99,383)
+
+```
+
+## Estatística de pearson generalizada
+
+Por meio desta estatísitca ....................
+
+```{r, echo=TRUE, include=TRUE}
+##Mod_r
+x2p_r <- sum(residuals(mod_r,type = 'pearson')^2)
+pv_r <- 1 - pchisq(x2p_r,385)
+
+##Mod_1
+x2p_1 <- sum(residuals(mod_1,type = 'pearson')^2)
+pv_1 <- 1 - pchisq(x2p_1,382)
+
+##Mod_2
+x2p_2 <- sum(residuals(mod_2,type = 'pearson')^2)
+pv_2 <- 1 - pchisq(x2p_2,384)
+
+##Mod_3
+x2p_3 <- sum(residuals(mod_3,type = 'pearson')^2)
+pv_3 <- 1 - pchisq(x2p_3,384)
+
+##Mod_4
+x2p_4 <- sum(residuals(mod_4,type = 'pearson')^2)
+pv_4 <- 1 - pchisq(x2p_4,384)
+
+##Mod_5
+x2p_5 <- sum(residuals(mod_5,type = 'pearson')^2)
+pv_5 <- 1 - pchisq(x2p_5,383)
+
+##Mod_6
+x2p_6 <- sum(residuals(mod_6,type = 'pearson')^2)
+pv_6 <- 1 - pchisq(x2p_6,383)
+
+##Mod_7
+x2p_7 <- sum(residuals(mod_7,type = 'pearson')^2)
+pv_7 <- 1 - pchisq(x2p_7,383)
+
+epg <- data.frame(Mod_r = c(x2p_r,pv_r),
+                  Mod_1 = c(x2p_1,pv_1),
+                  Mod_2 = c(x2p_2,pv_2),
+                  Mod_3 = c(x2p_3,pv_3),
+                  Mod_4 = c(x2p_4,pv_4),
+                  Mod_5 = c(x2p_5,pv_5),
+                  Mod_6 = c(x2p_6,pv_6),
+                  Mod_7 = c(x2p_7,pv_7))
+
+View(epg)
+```
+
+## Escolhendo um modelo
+
+Para avaliar quais variáveis, além das variáveis de controle, vão permanecer no modelo final podemos realizar uma
+
+```{r, echo=TRUE, include=TRUE}
+# Avaliando a inclusão da Diabetes no modelo
+anova(mod_r, mod_2)
+
+# Avaliando a inclusão da Hipertensão no modelo
+anova(mod_r, mod_3)
+
+# Avaliando a inclusão da Depressão no modelo
+anova(mod_r, mod_4)
+
+
+# Avaliando a inclusão da iteração Diabetes*Depressão
+anova(mod_6, mod_8)
+
+# Dando uma segunda chance para incluir a Hipertesão
+anova(mod_6, mod_1)
+
+```
+
+Dessa forma, o modelo final escolhido (`mod_6`) contém as cariáveis de controle, Diabetes e Depressão.
+
+## Escore z e p-valor para os coeficientes estimados
+
+```{r, echo=TRUE, include=TRUE}
+z <- summary(mod_6)$coefficients/summary(mod_6)$standard.errors
+z
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+p
+```
+
+## Análise de resíduos 
+
+```{r, echo=TRUE, include=TRUE}
+rP <- mod_1$residuals
+rCD <- residuals(mod_1, type = 'deviance')
+
+plot(x=mod_1$fitted.values,y = rP,type = 'p',xlab = 'Valores ajustado', ylab = 'Residuo de Pearson')
+abline(h=0, col = 'red')
+
+plot(x=mod_1$fitted.values,y = rCD,type = 'p',xlab = 'Valores ajustado', ylab = 'Residuo Componente do desvio')
+abline(h=0, col = 'red')
+```
+
+## Teste da Razão de Verossimilhança 
+
+Esse teste é utilizado para verificar qualidade do ajuste. 
+
+```{r, echo=TRUE, include=TRUE}
+chisq.test(dados_2$Diagnostico_2, predict(mod_1))
+
+lrtest(mod_1, "Diabetes_2")
+
+lrtest(mod_1, "Hipertensao_2")
+
+lrtest(mod_1, "Depressao_2")
+```
+
